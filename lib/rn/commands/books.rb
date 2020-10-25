@@ -2,9 +2,9 @@ module RN
   module Commands
     module Books
       class Create < Dry::CLI::Command
-        desc 'Create a book'
+        desc "Create a book"
 
-        argument :name, required: true, desc: 'Name of the book'
+        argument :name, required: true, desc: "Name of the book"
 
         example [
           '"My book" # Creates a new book named "My book"',
@@ -12,24 +12,25 @@ module RN
         ]
 
         def call(name:, **)
-          #warn "TODO: Implementar creación del cuaderno de notas con nombre '#{name}'.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}.".
-          if Dir.exists?(books_path(name))
-            puts "the book #{name} already exists, your note will be saved there"
+          # warn "TODO: Implementar creación del cuaderno de notas con nombre '#{name}'.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}.".
+          if Dir.exist?(books_path(name))
+            puts "the book '#{name}' already exists, your note will be saved there"
           else
             puts "creating book"
             Dir.mkdir(books_path(name))
+            puts "book created succesfully"
           end
         end
       end
 
       class Delete < Dry::CLI::Command
-        desc 'Delete a book'
+        desc "Delete a book"
 
-        argument :name, required: false, desc: 'Name of the book'
-        option :global, type: :boolean, default: false, desc: 'Operate on the global book'
+        argument :name, required: false, desc: "Name of the book"
+        option :global, type: :boolean, default: false, desc: "Operate on the global book"
 
         example [
-          '--global  # Deletes all notes from the global book',
+          "--global  # Deletes all notes from the global book",
           '"My book" # Deletes a book named "My book" and all of its notes',
           'Memoires  # Deletes a book named "Memoires" and all of its notes'
         ]
@@ -41,10 +42,10 @@ module RN
       end
 
       class List < Dry::CLI::Command
-        desc 'List books'
+        desc "List books"
 
         example [
-          '          # Lists every available book'
+          "          # Lists every available book"
         ]
 
         def call(*)
@@ -53,10 +54,10 @@ module RN
       end
 
       class Rename < Dry::CLI::Command
-        desc 'Rename a book'
+        desc "Rename a book"
 
-        argument :old_name, required: true, desc: 'Current name of the book'
-        argument :new_name, required: true, desc: 'New name of the book'
+        argument :old_name, required: true, desc: "Current name of the book"
+        argument :new_name, required: true, desc: "New name of the book"
 
         example [
           '"My book" "Our book"         # Renames the book "My book" to "Our book"',
