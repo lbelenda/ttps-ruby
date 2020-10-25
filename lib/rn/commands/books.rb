@@ -12,7 +12,13 @@ module RN
         ]
 
         def call(name:, **)
-          warn "TODO: Implementar creación del cuaderno de notas con nombre '#{name}'.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          #warn "TODO: Implementar creación del cuaderno de notas con nombre '#{name}'.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}.".
+          if Dir.exists?(books_path(name))
+            puts "the book #{name} already exists, your note will be saved there"
+          else
+            puts "creating book"
+            Dir.mkdir(books_path(name))
+          end
         end
       end
 

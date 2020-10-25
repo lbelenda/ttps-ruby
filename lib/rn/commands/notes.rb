@@ -13,9 +13,19 @@ module RN
           'thoughts --book Memoires    # Creates a note titled "thoughts" in the book "Memoires"'
         ]
 
+        require_relative "../helpers/paths"
+        require_relative "./books"
+
         def call(title:, **options)
+          p options.inspect
           book = options[:book]
-          warn "TODO: Implementar creación de la nota con título '#{title}' (en el libro '#{book}').\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          ###RN::Commands::Books::Create(book) AVERIGUAR COMO LLAMAR A UN CLI DESDE OTRO CLI ###
+          if !File.exists?("#{books_path(book)}/#{title}")
+            File.open("#{books_path(book)}/#{title}", "w") { |f| f.write "unestring" }
+          else
+            puts "the note already exists, maybe you want to edit it?"
+          end
+          #warn "TODO: Implementar creación de la nota con título '#{title}' (en el libro '#{book}').\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
         end
       end
 
