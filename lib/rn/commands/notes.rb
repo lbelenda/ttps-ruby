@@ -13,15 +13,23 @@ module RN
           'thoughts --book Memoires    # Creates a note titled "thoughts" in the book "Memoires"'
         ]
 
+        require "tempfile"
+
         def call(title:, **options)
           book = options[:book]
           Books::Create.new.call name: book unless book.nil?
           if !File.exist? files_path(book, title)
-            puts "Stop writing the note with CTRL + D"
-            file = File.open(files_path(book, title), "w")
-            text = STDIN.read
-            file.write text
-            puts "note created succesfully"
+            puts "Opening text editor..."
+            tmp = Tempfile.new("buffer")
+            tmp.rewind
+            TTY::Editor.open(tmp.path, command: "nano")
+            if tmp.size > 0
+              TTY::File.copy_file tmp.path, files_path(book, title)
+              puts "Note created succesfully."
+              puts "Closing text editor"
+            else
+              puts "You cannot create an empty note."
+            end
           else
             puts "the note already exist, maybe you want to edit it?"
           end
@@ -111,21 +119,17 @@ module RN
           book = options[:book]
           global = options[:global]
           if book.nil? && !global
-            Dir.chdir(books_path(nil))
-            filenames = Dir.glob("*").reject { |filename| File.directory? filename }
-            directories = Dir.glob("*").select { |filename| File.directory? filename }
+            filenames = get_notes_from_path(books_path(nil))
+            directories = get_books_from_path(books_path(nil))
             directories.each do |directory|
-              Dir.chdir(books_path(directory))
-              filenames.push(Dir.glob("*").reject { |filename| File.directory? filename })
+              filenames.push(get_notes_from_path(directory))
             end
             puts "All notes:\n #{filenames.join("\n")}"
           elsif book.nil? && global
-            Dir.chdir(books_path(nil))
-            filenames = Dir.glob("*").select { |filename| File.file? filename }
+            filenames = get_notes_from_path(books_path(nil))
             puts "Global notes:\n #{filenames.join("\n")}"
           elsif book
-            Dir.chdir(books_path(book))
-            filenames = Dir.glob("*").select { |filename| File.file? filename }
+            filenames = get_notes_from_path(books_path(book))
             puts "#{book} notes:\n#{filenames.join("\n")}"
           end
         end
