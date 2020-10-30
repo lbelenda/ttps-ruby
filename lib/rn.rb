@@ -7,4 +7,5 @@ module RN
   # Por ejemplo:
   # autoload :Note, 'rn/note'
   require "rn/helpers/paths"
+  require "rn/helpers/functions"
 end

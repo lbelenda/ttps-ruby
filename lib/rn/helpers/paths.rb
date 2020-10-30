@@ -2,7 +2,7 @@ DEFAULT_DIR = "#{ENV["HOME"]}/.my_rns" # a preguntar si lo creo o no la primera 
 FileUtils.mkdir_p(DEFAULT_DIR)
 
 def books_path(book)
-  book ? "#{DEFAULT_DIR}/#{book}" : DEFAULT_DIR
+  book.nil? ? DEFAULT_DIR : "#{DEFAULT_DIR}/#{book}"
 end
 
 def files_path(book, file)

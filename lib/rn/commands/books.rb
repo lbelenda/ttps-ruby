@@ -17,7 +17,7 @@ module RN
             puts "the book '#{name}' already exists, your note will be saved there"
           else
             puts "creating book"
-            Dir.mkdir(books_path(name))
+            TTY::File.create_dir(books_path(name))
             puts "book created succesfully"
           end
         end
@@ -37,7 +37,35 @@ module RN
 
         def call(name: nil, **options)
           global = options[:global]
-          warn "TODO: Implementar borrado del cuaderno de notas con nombre '#{name}' (global=#{global}).\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          if global
+            puts "Are you sure you want to delete ALL the notes from global book? [y/n]"
+            choice = STDIN.gets.chomp
+            if choice === "y"
+              if get_notes_from_path(books_path(nil)).any?
+                get_notes_from_path(books_path(nil)).each { |note| File.delete(note) }
+                puts "ALL notes from global book were deleted succesfully"
+              else
+                puts "Global book is empty"
+              end
+            else
+              puts("Deletion of ALL books cancelled")
+            end
+          elsif name
+            if Dir.exists?(books_path(name))
+              puts("Are you sure you want to delete the book '#{name}'? [y/n]")
+              choice = STDIN.gets.chomp
+              if choice === "y"
+                FileUtils.rm_rf(books_path(name))
+                puts "Book '#{name}' deleted succesfully"
+              else
+                puts("Deletion of '#{name}' cancelled")
+              end
+            else
+              puts "Book '#{name}' does not exist"
+            end
+          else
+            puts "Please use --global or type a book name as parameter"
+          end
         end
       end
 
@@ -49,7 +77,8 @@ module RN
         ]
 
         def call(*)
-          warn "TODO: Implementar listado de los cuadernos de notas.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          directories = get_books_from_path(books_path(nil))
+          puts "Available books:\n - #{directories.join("\n - ")}"
         end
       end
 
@@ -66,7 +95,16 @@ module RN
         ]
 
         def call(old_name:, new_name:, **)
-          warn "TODO: Implementar renombrado del cuaderno de notas con nombre '#{old_name}' para que pase a llamarse '#{new_name}'.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          if File.exist? books_path(old_name)
+            if !File.exist? books_path(new_name)
+              File.rename(books_path(old_name), books_path(new_name))
+              puts "Book '#{old_name}' renamed to: '#{new_name}' succesfully."
+            else
+              puts "Error: Book with name '#{new_name}' already exists, please choose another"
+            end
+          else
+            puts "Error: Book '#{old_name}' does not exist."
+          end
         end
       end
     end

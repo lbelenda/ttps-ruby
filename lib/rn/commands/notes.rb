@@ -22,8 +22,9 @@ module RN
             puts "Opening text editor..."
             tmp = Tempfile.new("buffer")
             tmp.rewind
-            TTY::Editor.open(tmp.path, command: "nano")
+            TTY::Editor.open(tmp.path, command: default_editor)
             if tmp.size > 0
+              title += ".rn"
               TTY::File.copy_file tmp.path, files_path(book, title)
               puts "Note created succesfully."
               puts "Closing text editor"
@@ -50,13 +51,13 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
+          title += ".rn"
           if File.exist? files_path(book, title)
-            File.delete files_path(book, title)
+            TTY::File.remove_file files_path(book, title)
             puts "File '#{title}' removed succesfully."
           else
             puts "Error: File '#{title}' does not exist."
           end
-          # warn "TODO: Implementar borrado de la nota con título '#{title}' (del libro '#{book}').\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
         end
       end
 
@@ -74,7 +75,13 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          warn "TODO: Implementar modificación de la nota con título '#{title}' (del libro '#{book}').\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          title += ".rn"
+          if File.exist? files_path(book, title)
+            TTY::Editor.open(files_path(book, title), command: default_editor)
+            puts "File '#{title}' updated succesfully."
+          else
+            puts "Error: File #{title} does not exist."
+          end
         end
       end
 
@@ -93,12 +100,18 @@ module RN
 
         def call(old_title:, new_title:, **options)
           book = options[:book]
+          old_title += ".rn"
+          new_title += ".rn"
           if File.exist? files_path(book, old_title)
-            File.rename(files_path(book, old_title), files_path(book, new_title))
+            if File.exist? files_path(book, new_title)
+              puts "Error: File #{new_title} already exists, please try with another name"
+            else
+              File.rename(files_path(book, old_title), files_path(book, new_title))
+              puts "Renamed file #{old_title} to #{new_title}"
+            end
           else
             puts "Error: File #{old_title} does not exist."
           end
-          # warn "TODO: Implementar cambio del título de la nota con título '#{old_title}' hacia '#{new_title}' (del libro '#{book}').\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
         end
       end
 
@@ -119,10 +132,11 @@ module RN
           book = options[:book]
           global = options[:global]
           if book.nil? && !global
-            filenames = get_notes_from_path(books_path(nil))
-            directories = get_books_from_path(books_path(nil))
+            filenames = get_notes_from_path(books_path(book))
+            puts "el libro es #{book.nil?}"
+            directories = get_books_from_path(books_path(book))
             directories.each do |directory|
-              filenames.push(get_notes_from_path(directory))
+              !directory.empty? && filenames.push(get_notes_from_path(directory))
             end
             puts "All notes:\n #{filenames.join("\n")}"
           elsif book.nil? && global
@@ -149,7 +163,12 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          warn "TODO: Implementar vista de la nota con título '#{title}' (del libro '#{book}').\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          title += ".rn"
+          if File.exist? files_path(book, title)
+            File.foreach(files_path(book, title)) { |line| puts line }
+          else
+            puts "Error: file #{title} does not exist"
+          end
         end
       end
     end
