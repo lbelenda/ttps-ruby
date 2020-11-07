@@ -133,14 +133,13 @@ module RN
           global = options[:global]
           if book.nil? && !global
             filenames = get_notes_from_path(books_path(book))
-            puts "el libro es #{book.nil?}"
             directories = get_books_from_path(books_path(book))
             directories.each do |directory|
-              !directory.empty? && filenames.push(get_notes_from_path(directory))
+              filenames.push(get_notes_from_path(books_path(directory))) unless Dir.empty?(books_path(directory))
             end
-            puts "All notes:\n #{filenames.join("\n")}"
+            puts "All notes:\n - #{filenames.join("\n - ")}"
           elsif book.nil? && global
-            filenames = get_notes_from_path(books_path(nil))
+            filenames = get_notes_from_path(books_path)
             puts "Global notes:\n #{filenames.join("\n")}"
           elsif book
             filenames = get_notes_from_path(books_path(book))

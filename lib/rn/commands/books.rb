@@ -39,10 +39,10 @@ module RN
           global = options[:global]
           if global
             puts "Are you sure you want to delete ALL the notes from global book? [y/n]"
-            choice = STDIN.gets.chomp
+            choice = $stdin.gets.chomp
             if choice === "y"
-              if get_notes_from_path(books_path(nil)).any?
-                get_notes_from_path(books_path(nil)).each { |note| File.delete(note) }
+              if get_notes_from_path(books_path).any?
+                get_notes_from_path(books_path).each { |note| File.delete(note) }
                 puts "ALL notes from global book were deleted succesfully"
               else
                 puts "Global book is empty"
@@ -51,9 +51,9 @@ module RN
               puts("Deletion of ALL books cancelled")
             end
           elsif name
-            if Dir.exists?(books_path(name))
+            if Dir.exist?(books_path(name))
               puts("Are you sure you want to delete the book '#{name}'? [y/n]")
-              choice = STDIN.gets.chomp
+              choice = $stdin.gets.chomp
               if choice === "y"
                 FileUtils.rm_rf(books_path(name))
                 puts "Book '#{name}' deleted succesfully"
@@ -77,7 +77,7 @@ module RN
         ]
 
         def call(*)
-          directories = get_books_from_path(books_path(nil))
+          directories = get_books_from_path(books_path)
           puts "Available books:\n - #{directories.join("\n - ")}"
         end
       end
