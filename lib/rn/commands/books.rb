@@ -2,9 +2,9 @@ module RN
   module Commands
     module Books
       class Create < Dry::CLI::Command
-        desc 'Create a book'
+        desc "Create a book"
 
-        argument :name, required: true, desc: 'Name of the book'
+        argument :name, required: true, desc: "Name of the book"
 
         example [
           '"My book" # Creates a new book named "My book"',
@@ -12,45 +12,81 @@ module RN
         ]
 
         def call(name:, **)
-          warn "TODO: Implementar creación del cuaderno de notas con nombre '#{name}'.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          # warn "TODO: Implementar creación del cuaderno de notas con nombre '#{name}'.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}.".
+          if Dir.exist?(books_path(name))
+            puts "the book '#{name}' already exists, your note will be saved there"
+          else
+            puts "creating book"
+            TTY::File.create_dir(books_path(name))
+            puts "book created succesfully"
+          end
         end
       end
 
       class Delete < Dry::CLI::Command
-        desc 'Delete a book'
+        desc "Delete a book"
 
-        argument :name, required: false, desc: 'Name of the book'
-        option :global, type: :boolean, default: false, desc: 'Operate on the global book'
+        argument :name, required: false, desc: "Name of the book"
+        option :global, type: :boolean, default: false, desc: "Operate on the global book"
 
         example [
-          '--global  # Deletes all notes from the global book',
+          "--global  # Deletes all notes from the global book",
           '"My book" # Deletes a book named "My book" and all of its notes',
           'Memoires  # Deletes a book named "Memoires" and all of its notes'
         ]
 
         def call(name: nil, **options)
           global = options[:global]
-          warn "TODO: Implementar borrado del cuaderno de notas con nombre '#{name}' (global=#{global}).\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          if global
+            puts "Are you sure you want to delete ALL the notes from global book? [y/n]"
+            choice = $stdin.gets.chomp
+            if choice === "y"
+              if get_notes_from_path(books_path).any?
+                get_notes_from_path(books_path).each { |note| File.delete(note) }
+                puts "ALL notes from global book were deleted succesfully"
+              else
+                puts "Global book is empty"
+              end
+            else
+              puts("Deletion of ALL books cancelled")
+            end
+          elsif name
+            if Dir.exist?(books_path(name))
+              puts("Are you sure you want to delete the book '#{name}'? [y/n]")
+              choice = $stdin.gets.chomp
+              if choice === "y"
+                FileUtils.rm_rf(books_path(name))
+                puts "Book '#{name}' deleted succesfully"
+              else
+                puts("Deletion of '#{name}' cancelled")
+              end
+            else
+              puts "Book '#{name}' does not exist"
+            end
+          else
+            puts "Please use --global or type a book name as parameter"
+          end
         end
       end
 
       class List < Dry::CLI::Command
-        desc 'List books'
+        desc "List books"
 
         example [
-          '          # Lists every available book'
+          "          # Lists every available book"
         ]
 
         def call(*)
-          warn "TODO: Implementar listado de los cuadernos de notas.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          directories = get_books_from_path(books_path)
+          puts "Available books:\n - #{directories.join("\n - ")}"
         end
       end
 
       class Rename < Dry::CLI::Command
-        desc 'Rename a book'
+        desc "Rename a book"
 
-        argument :old_name, required: true, desc: 'Current name of the book'
-        argument :new_name, required: true, desc: 'New name of the book'
+        argument :old_name, required: true, desc: "Current name of the book"
+        argument :new_name, required: true, desc: "New name of the book"
 
         example [
           '"My book" "Our book"         # Renames the book "My book" to "Our book"',
@@ -59,7 +95,16 @@ module RN
         ]
 
         def call(old_name:, new_name:, **)
-          warn "TODO: Implementar renombrado del cuaderno de notas con nombre '#{old_name}' para que pase a llamarse '#{new_name}'.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          if File.exist? books_path(old_name)
+            if !File.exist? books_path(new_name)
+              File.rename(books_path(old_name), books_path(new_name))
+              puts "Book '#{old_name}' renamed to: '#{new_name}' succesfully."
+            else
+              puts "Error: Book with name '#{new_name}' already exists, please choose another"
+            end
+          else
+            puts "Error: Book '#{old_name}' does not exist."
+          end
         end
       end
     end

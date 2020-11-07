@@ -2,10 +2,10 @@ module RN
   module Commands
     module Notes
       class Create < Dry::CLI::Command
-        desc 'Create a note'
+        desc "Create a note"
 
-        argument :title, required: true, desc: 'Title of the note'
-        option :book, type: :string, desc: 'Book'
+        argument :title, required: true, desc: "Title of the note"
+        option :book, type: :string, desc: "Book"
 
         example [
           'todo                        # Creates a note titled "todo" in the global book',
@@ -13,17 +13,35 @@ module RN
           'thoughts --book Memoires    # Creates a note titled "thoughts" in the book "Memoires"'
         ]
 
+        require "tempfile"
+
         def call(title:, **options)
           book = options[:book]
-          warn "TODO: Implementar creación de la nota con título '#{title}' (en el libro '#{book}').\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          Books::Create.new.call name: book unless book.nil?
+          if !File.exist? files_path(book, title)
+            puts "Opening text editor..."
+            tmp = Tempfile.new("buffer")
+            tmp.rewind
+            TTY::Editor.open(tmp.path, command: default_editor)
+            if tmp.size > 0
+              title += ".rn"
+              TTY::File.copy_file tmp.path, files_path(book, title)
+              puts "Note created succesfully."
+              puts "Closing text editor"
+            else
+              puts "You cannot create an empty note."
+            end
+          else
+            puts "the note already exist, maybe you want to edit it?"
+          end
         end
       end
 
       class Delete < Dry::CLI::Command
-        desc 'Delete a note'
+        desc "Delete a note"
 
-        argument :title, required: true, desc: 'Title of the note'
-        option :book, type: :string, desc: 'Book'
+        argument :title, required: true, desc: "Title of the note"
+        option :book, type: :string, desc: "Book"
 
         example [
           'todo                        # Deletes a note titled "todo" from the global book',
@@ -33,15 +51,21 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          warn "TODO: Implementar borrado de la nota con título '#{title}' (del libro '#{book}').\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          title += ".rn"
+          if File.exist? files_path(book, title)
+            TTY::File.remove_file files_path(book, title)
+            puts "File '#{title}' removed succesfully."
+          else
+            puts "Error: File '#{title}' does not exist."
+          end
         end
       end
 
       class Edit < Dry::CLI::Command
-        desc 'Edit the content a note'
+        desc "Edit the content a note"
 
-        argument :title, required: true, desc: 'Title of the note'
-        option :book, type: :string, desc: 'Book'
+        argument :title, required: true, desc: "Title of the note"
+        option :book, type: :string, desc: "Book"
 
         example [
           'todo                        # Edits a note titled "todo" from the global book',
@@ -51,16 +75,22 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          warn "TODO: Implementar modificación de la nota con título '#{title}' (del libro '#{book}').\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          title += ".rn"
+          if File.exist? files_path(book, title)
+            TTY::Editor.open(files_path(book, title), command: default_editor)
+            puts "File '#{title}' updated succesfully."
+          else
+            puts "Error: File #{title} does not exist."
+          end
         end
       end
 
       class Retitle < Dry::CLI::Command
-        desc 'Retitle a note'
+        desc "Retitle a note"
 
-        argument :old_title, required: true, desc: 'Current title of the note'
-        argument :new_title, required: true, desc: 'New title for the note'
-        option :book, type: :string, desc: 'Book'
+        argument :old_title, required: true, desc: "Current title of the note"
+        argument :new_title, required: true, desc: "New title for the note"
+        option :book, type: :string, desc: "Book"
 
         example [
           'todo TODO                                 # Changes the title of the note titled "todo" from the global book to "TODO"',
@@ -70,19 +100,30 @@ module RN
 
         def call(old_title:, new_title:, **options)
           book = options[:book]
-          warn "TODO: Implementar cambio del título de la nota con título '#{old_title}' hacia '#{new_title}' (del libro '#{book}').\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          old_title += ".rn"
+          new_title += ".rn"
+          if File.exist? files_path(book, old_title)
+            if File.exist? files_path(book, new_title)
+              puts "Error: File #{new_title} already exists, please try with another name"
+            else
+              File.rename(files_path(book, old_title), files_path(book, new_title))
+              puts "Renamed file #{old_title} to #{new_title}"
+            end
+          else
+            puts "Error: File #{old_title} does not exist."
+          end
         end
       end
 
       class List < Dry::CLI::Command
-        desc 'List notes'
+        desc "List notes"
 
-        option :book, type: :string, desc: 'Book'
-        option :global, type: :boolean, default: false, desc: 'List only notes from the global book'
+        option :book, type: :string, desc: "Book"
+        option :global, type: :boolean, default: false, desc: "List only notes from the global book"
 
         example [
-          '                 # Lists notes from all books (including the global book)',
-          '--global         # Lists notes from the global book',
+          "                 # Lists notes from all books (including the global book)",
+          "--global         # Lists notes from the global book",
           '--book "My book" # Lists notes from the book named "My book"',
           '--book Memoires  # Lists notes from the book named "Memoires"'
         ]
@@ -90,15 +131,28 @@ module RN
         def call(**options)
           book = options[:book]
           global = options[:global]
-          warn "TODO: Implementar listado de las notas del libro '#{book}' (global=#{global}).\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          if book.nil? && !global
+            filenames = get_notes_from_path(books_path(book))
+            directories = get_books_from_path(books_path(book))
+            directories.each do |directory|
+              filenames.push(get_notes_from_path(books_path(directory))) unless Dir.empty?(books_path(directory))
+            end
+            puts "All notes:\n - #{filenames.join("\n - ")}"
+          elsif book.nil? && global
+            filenames = get_notes_from_path(books_path)
+            puts "Global notes:\n #{filenames.join("\n")}"
+          elsif book
+            filenames = get_notes_from_path(books_path(book))
+            puts "#{book} notes:\n#{filenames.join("\n")}"
+          end
         end
       end
 
       class Show < Dry::CLI::Command
-        desc 'Show a note'
+        desc "Show a note"
 
-        argument :title, required: true, desc: 'Title of the note'
-        option :book, type: :string, desc: 'Book'
+        argument :title, required: true, desc: "Title of the note"
+        option :book, type: :string, desc: "Book"
 
         example [
           'todo                        # Shows a note titled "todo" from the global book',
@@ -108,7 +162,12 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          warn "TODO: Implementar vista de la nota con título '#{title}' (del libro '#{book}').\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          title += ".rn"
+          if File.exist? files_path(book, title)
+            File.foreach(files_path(book, title)) { |line| puts line }
+          else
+            puts "Error: file #{title} does not exist"
+          end
         end
       end
     end
