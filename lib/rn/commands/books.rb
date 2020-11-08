@@ -40,25 +40,30 @@ module RN
           if global
             puts "Are you sure you want to delete ALL the notes from global book? [y/n]"
             choice = $stdin.gets.chomp
-            if choice === "y"
+            case choice
+            when "y"
               if get_notes_from_path(books_path).any?
                 get_notes_from_path(books_path).each { |note| File.delete(note) }
                 puts "ALL notes from global book were deleted succesfully"
               else
                 puts "Global book is empty"
               end
+            when "n"
+              puts "Deletion of ALL books cancelled"
             else
-              puts("Deletion of ALL books cancelled")
+              puts "Wrong option."
             end
           elsif name
             if Dir.exist?(books_path(name))
               puts("Are you sure you want to delete the book '#{name}'? [y/n]")
               choice = $stdin.gets.chomp
-              if choice === "y"
-                FileUtils.rm_rf(books_path(name))
-                puts "Book '#{name}' deleted succesfully"
+              case choice
+              when "y"
+                FileUtils.rm_rf(books_path(name)); puts "Book '#{name}' deleted succesfully"
+              when "n"
+                puts "Deletion of '#{name}' cancelled"
               else
-                puts("Deletion of '#{name}' cancelled")
+                puts "Wrong option."
               end
             else
               puts "Book '#{name}' does not exist"
