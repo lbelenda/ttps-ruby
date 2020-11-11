@@ -11,3 +11,7 @@ end
 def default_editor
   ENV["EDITOR"].split("/")[-1]
 end
+
+def valid_name?(name)
+  /^[a-zA-Z\d\s]*$/.match?(name)
+end

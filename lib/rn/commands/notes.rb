@@ -17,15 +17,23 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          title += ".rn"
-          Books::Create.new.call name: book unless book.nil?
-          tmp = Tempfile.new("buffer")
-          tmp.rewind
-          TTY::Editor.open(tmp.path, command: default_editor)
-          if tmp.size > 0
-            TTY::File.copy_file tmp.path, files_path(book, title)
+          if valid_name? title
+            title += ".rn"
+            if (valid_name?(book) && !book.nil?)
+              Books::Create.new.call name: book
+            else
+              return puts "Only numbers, letters and spaces are allowed for the book title"
+            end
+            tmp = Tempfile.new("buffer")
+            tmp.rewind
+            TTY::Editor.open(tmp.path, command: default_editor)
+            if tmp.size > 0
+              TTY::File.copy_file tmp.path, files_path(book, title)
+            else
+              puts "You cannot create an empty note."
+            end
           else
-            puts "You cannot create an empty note."
+            puts "Only numbers, letters and spaces are allowed for the note title"
           end
         rescue Errno::EACCES
           puts "Permission denied for create '#{title}' on '#{books_path(book)}'"
