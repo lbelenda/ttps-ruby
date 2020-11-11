@@ -18,7 +18,7 @@ module RN
           else
             puts "creating book"
             TTY::File.create_dir(books_path(name))
-            puts "book created succesfully"
+            puts "book '#{name}' created succesfully"
           end
         end
       end
@@ -49,7 +49,7 @@ module RN
                 puts "Global book is empty"
               end
             when "n"
-              puts "Deletion of ALL books cancelled"
+              puts "Deletion of ALL notes from global book cancelled"
             else
               puts "Wrong option."
             end
