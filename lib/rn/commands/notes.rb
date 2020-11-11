@@ -17,23 +17,18 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
+          title += ".rn"
           Books::Create.new.call name: book unless book.nil?
-          if !File.exist? files_path(book, title)
-            puts "Opening text editor..."
-            tmp = Tempfile.new("buffer")
-            tmp.rewind
-            TTY::Editor.open(tmp.path, command: default_editor)
-            if tmp.size > 0
-              title += ".rn"
-              TTY::File.copy_file tmp.path, files_path(book, title)
-              puts "Note created succesfully."
-              puts "Closing text editor"
-            else
-              puts "You cannot create an empty note."
-            end
+          tmp = Tempfile.new("buffer")
+          tmp.rewind
+          TTY::Editor.open(tmp.path, command: default_editor)
+          if tmp.size > 0
+            TTY::File.copy_file tmp.path, files_path(book, title)
           else
-            puts "the note already exist, maybe you want to edit it?"
+            puts "You cannot create an empty note."
           end
+        rescue Errno::EACCES
+          puts "Permission denied for create '#{title}' on '#{books_path(book)}'"
         end
       end
 
@@ -140,10 +135,10 @@ module RN
             puts "All notes:\n - #{filenames.join("\n - ")}"
           elsif book.nil? && global
             filenames = get_notes_from_path(books_path)
-            puts "Global notes:\n #{filenames.join("\n")}"
+            puts "Global notes:\n #{filenames.join("\n - ")}"
           elsif book
             filenames = get_notes_from_path(books_path(book))
-            puts "#{book} notes:\n#{filenames.join("\n")}"
+            puts "#{book} notes:\n#{filenames.join("\n - ")}"
           end
         end
       end
@@ -166,7 +161,7 @@ module RN
           if File.exist? files_path(book, title)
             File.foreach(files_path(book, title)) { |line| puts line }
           else
-            puts "Error: file #{title} does not exist"
+            puts "Error: file '#{title}' does not exist"
           end
         end
       end
