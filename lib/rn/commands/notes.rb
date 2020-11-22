@@ -19,10 +19,12 @@ module RN
           book = options[:book]
           if valid_name? title
             title += ".rn"
-            if (valid_name?(book) && !book.nil?)
-              Books::Create.new.call name: book
-            else
-              return puts "Only numbers, letters and spaces are allowed for the book title"
+            if !book.nil?
+              if valid_name?(book)
+                Books::Create.new.call name: book
+              else
+                return puts "Only numbers, letters and spaces are allowed for the book title"
+              end
             end
             tmp = Tempfile.new("buffer")
             tmp.rewind
