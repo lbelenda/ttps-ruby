@@ -4,10 +4,13 @@ class Note
   require "tempfile"
 
   def self.create(title, book)
+
+    require_relative "../classes/book"
+
     if valid_name? title
       if !book.nil?
         if valid_name?(book)
-          Books::Create.new.call name: book
+          Book.create(book)
         else
           return puts "Only numbers, letters and spaces are allowed for the book title"
         end
@@ -16,6 +19,7 @@ class Note
       tmp.rewind
       TTY::Editor.open(tmp.path, command: default_editor)
       if tmp.size > 0
+        title += ".rn"
         TTY::File.copy_file tmp.path, files_path(book, title)
       else
         puts "You cannot create an empty note."
@@ -57,6 +61,20 @@ class Note
       puts "File '#{title}' removed succesfully."
     else
       puts "Error: File '#{title}' does not exist."
+    end
+  end
+
+  def self.export_html(title, book)
+    require "redcarpet"
+    markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true)
+    note_title = title + ".rn"
+    exported_note_title = title + ".html"
+    if File.exist? files_path(book, note_title)
+      text = File.read(files_path(book, note_title))
+      tmp = markdown.render(text)
+      TTY::File.create_file files_path(book, exported_note_title), tmp
+    else
+      puts "Note '#{note_title}' does not exist"
     end
   end
 

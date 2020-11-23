@@ -17,7 +17,6 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          title += ".rn"
           Note.create(title, book)
         rescue Errno::EACCES
           puts "Permission denied for create '#{title}' on '#{books_path(book)}'"
@@ -138,6 +137,26 @@ module RN
           end
         end
       end
+
+      class ExportHTML < Dry::CLI::Command
+        desc "Export a note from Markdown to HTML"
+
+        argument :title, required: true, desc: "Title of the note"
+        option :book, type: :string, desc: "Book"
+
+        example [
+          'todo                        # Exports a note titled "todo" from the global book',
+          '"New note" --book "My book" # Exports a note titled "New note" from the book "My book"',
+          'thoughts --book Memoires    # Exports a note titled "thoughts" from the book "Memoires"'
+        ]
+
+        def call(title:, **options)
+          book = options[:book]
+          Note.export_html(title, book)
+        end
+      end
+
+
     end
   end
 end
