@@ -67,10 +67,10 @@ class Note
   def self.export_html(title, book)
     require "redcarpet"
     markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true)
-    note_title = title + ".rn"
-    exported_note_title = title + ".html"
-    if File.exist? files_path(book, note_title)
-      text = File.read(files_path(book, note_title))
+    note_title = title.split(".rn").first
+    exported_note_title = note_title + ".html"
+    if File.exist? files_path(book, title)
+      text = File.read(files_path(book, title))
       tmp = markdown.render(text)
       TTY::File.create_file files_path(book, exported_note_title), tmp
     else

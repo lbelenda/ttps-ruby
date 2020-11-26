@@ -5,7 +5,7 @@ end
 
 def get_notes_from_path(books_path)
   Dir.chdir(books_path)
-  Dir.glob("*").reject { |filename| File.directory? filename }
+  Dir.glob("*").reject { |filename| (File.directory?(filename) || filename.include?(".html")) }
 end
 
 def default_editor

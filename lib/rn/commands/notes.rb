@@ -141,22 +141,51 @@ module RN
       class ExportHTML < Dry::CLI::Command
         desc "Export a note from Markdown to HTML"
 
-        argument :title, required: true, desc: "Title of the note"
+        option :title, type: :string, desc: "Title of the note"
         option :book, type: :string, desc: "Book"
+        option :all, type: :boolean, default: false, desc: "Export all notes from all books"
 
         example [
+          '--all                       # Exports all notes from all books',
+          '--all --book "My Book"      # Exports all notes from the book "My Book"',
           'todo                        # Exports a note titled "todo" from the global book',
           '"New note" --book "My book" # Exports a note titled "New note" from the book "My book"',
           'thoughts --book Memoires    # Exports a note titled "thoughts" from the book "Memoires"'
         ]
 
-        def call(title:, **options)
+        def call(**options)
           book = options[:book]
-          Note.export_html(title, book)
+          all = options[:all]
+          title = options[:title]
+          title += ".rn" unless title.nil?
+          if all
+            if book.nil?
+              global_notes = get_notes_from_path(books_path(book))
+              global_notes.each do |global_note|
+                Note.export_html(global_note, book)
+              end
+              directories = get_books_from_path(books_path(book))
+              directories.each do |directory|
+                unless Dir.empty?(books_path(directory))
+                  dir_notes = get_notes_from_path(books_path(directory))
+                  dir_notes.each do |dir_note|
+                    Note.export_html(dir_note, directory)
+                  end
+                end
+              end
+            else
+              if Dir.exist?(books_path(book))
+                book_notes = get_notes_from_path(books_path(book))
+                book_notes.each { |book_note| Note.export_html(book_note, book) }
+              else
+                puts "The book '#{book}' does not exist."
+              end
+            end
+          else
+            title ? Note.export_html(title, book) : puts("Please type the title of the note that you want to export")
+          end
         end
       end
-
-
     end
   end
 end
