@@ -1,16 +1,11 @@
 # rn
 
-Plantilla para comenzar con el Trabajo Práctico Integrador de la cursada 2020 de la materia
-Taller de Tecnologías de Producción de Software - Opción Ruby, de la Facultad de Informática
+Trabajo Práctico Integrador de la cursada 2020 de la materia Taller de Tecnologías de Producción de Software - Opción Ruby, de la Facultad de Informática
 de la Universidad Nacional de La Plata.
 
 Ruby Notes, o simplemente `rn`, es un gestor de notas concebido como un clon simplificado
 de la excelente herramienta [TomBoy](https://wiki.gnome.org/Apps/Tomboy).
 
-Este proyecto es simplemente una plantilla para comenzar a implementar la herramienta e
-intenta proveer un punto de partida para el desarrollo, simplificando el _bootstrap_ del
-proyecto que puede ser una tarea que consume mucho tiempo y conlleva la toma de algunas
-decisiones que pueden tener efectos tanto positivos como negativos en el proyecto.
 
 ## Uso de `rn`
 
@@ -45,20 +40,56 @@ $ rn [args]
 
 > Notá que para la ejecución de la herramienta, es necesario tener una versión reciente de
 > Ruby (2.5 o posterior) y tener instaladas sus dependencias, las cuales se manejan con
-> Bundler. Para más información sobre la instalación de las dependencias, consultar la
-> siguiente sección ("Desarrollo").
+> Bundler. Para más información sobre la instalación de las dependencias, consultar la sección ("Desarrollo").
 
-Documentar el uso para usuarios finales de la herramienta queda fuera del alcance de esta
-plantilla y **se deja como una tarea para que realices en tu entrega**, pisando el contenido
-de este archivo `README.md` o bien en uno nuevo. Ese archivo deberá contener cualquier
-documentación necesaria para entender el funcionamiento y uso de la herramienta que hayas
-implementado, junto con cualquier decisión de diseño del modelo de datos que consideres
-necesario documentar.
+### Estructura para escribir las notas
+
+
+Las almohadillas "#" son uno de los métodos utilizados en Markdown para crear encabezados, añadiendo de a una por nivel, es decir
+```
+# Encabezado 1
+## Encabezado 2
+### Encabezado 3
+#### Encabezado 4
+##### Encabezado 5
+###### Encabezado 6
+```
+Las citas se generar utilizando el carácter mayor que ">" al comienzo del bloque de texto. Si la cita en cuestión se compone de varios párrafos, deberás añadir el mismo símbolo > al comienzo de cada uno de ellos e incluso se pueden concatenar varios >> para crear citas anidadas.
+
+>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+
+Para crear listas desordenadas se utiliza __*__ asteriscos, __-__ guiones, o __+__ símbolo de suma.
+
+```
+- Elemento de lista 1
+* Elemento de lista 2
++ Elemento de lista 3
+```
+
+#### Elementos de enfasis:
+
+`*cursiva*` o `_cursiva_` // *cursiva*
+
+`**negrita**` o `__negrita__` // **negrita**
+
+
+### Exportacion de notas
+
+Para realizar la exportacion de notas se utiliza el siguiente comando:
+
+`  rn notes export_html  `
+
+El cual acepta distintos tipos de parametros, los cuales son:
+
+-  `--title "pago de servicios"`
+-  `--title "pago de servicios" --book "cuentas"`
+- `--all`
+- `--all --book "cuentas"`
+
+La exportacion de una nota generará un archivo con extension `.html` en el mismo lugar donde la/las notas originales esten presentes
+
 
 ## Desarrollo
-
-Esta sección provee algunos tips para el desarrollo de tu entrega a partir de esta
-plantilla.
 
 ### Instalación de dependencias
 
@@ -83,11 +114,7 @@ Una vez que la instalación de las dependencias sea exitosa (esto deberías hace
 cuando estés comenzando con la utilización del proyecto), podés comenzar a probar la
 herramienta y a desarrollar tu entrega.
 
-### Estructura de la plantilla
-
-El proyecto te provee una estructura inicial en la cual podés basarte para implementar tu
-entrega. Esta estructura no es necesariamente rígida, pero tené en cuenta que modificarla
-puede requerir algún trabajo adicional de tu parte.
+### Estructura del proyecto
 
 * `lib/`: directorio que contiene todas las clases del modelo y de soporte para la ejecución
   del programa `bin/rn`.
