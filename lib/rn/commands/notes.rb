@@ -13,30 +13,11 @@ module RN
           'thoughts --book Memoires    # Creates a note titled "thoughts" in the book "Memoires"'
         ]
 
-        require "tempfile"
+        require_relative "../classes/note"
 
         def call(title:, **options)
           book = options[:book]
-          if valid_name? title
-            title += ".rn"
-            if !book.nil?
-              if valid_name?(book)
-                Books::Create.new.call name: book
-              else
-                return puts "Only numbers, letters and spaces are allowed for the book title"
-              end
-            end
-            tmp = Tempfile.new("buffer")
-            tmp.rewind
-            TTY::Editor.open(tmp.path, command: default_editor)
-            if tmp.size > 0
-              TTY::File.copy_file tmp.path, files_path(book, title)
-            else
-              puts "You cannot create an empty note."
-            end
-          else
-            puts "Only numbers, letters and spaces are allowed for the note title"
-          end
+          Note.create(title, book)
         rescue Errno::EACCES
           puts "Permission denied for create '#{title}' on '#{books_path(book)}'"
         end
@@ -57,12 +38,7 @@ module RN
         def call(title:, **options)
           book = options[:book]
           title += ".rn"
-          if File.exist? files_path(book, title)
-            TTY::File.remove_file files_path(book, title)
-            puts "File '#{title}' removed succesfully."
-          else
-            puts "Error: File '#{title}' does not exist."
-          end
+          Note.delete(title, book)
         end
       end
 
@@ -81,12 +57,7 @@ module RN
         def call(title:, **options)
           book = options[:book]
           title += ".rn"
-          if File.exist? files_path(book, title)
-            TTY::Editor.open(files_path(book, title), command: default_editor)
-            puts "File '#{title}' updated succesfully."
-          else
-            puts "Error: File #{title} does not exist."
-          end
+          Note.edit(title, book)
         end
       end
 
@@ -107,16 +78,7 @@ module RN
           book = options[:book]
           old_title += ".rn"
           new_title += ".rn"
-          if File.exist? files_path(book, old_title)
-            if File.exist? files_path(book, new_title)
-              puts "Error: File #{new_title} already exists, please try with another name"
-            else
-              File.rename(files_path(book, old_title), files_path(book, new_title))
-              puts "Renamed file #{old_title} to #{new_title}"
-            end
-          else
-            puts "Error: File #{old_title} does not exist."
-          end
+          Note.retitle(old_title, new_title, book)
         end
       end
 
@@ -169,9 +131,58 @@ module RN
           book = options[:book]
           title += ".rn"
           if File.exist? files_path(book, title)
-            File.foreach(files_path(book, title)) { |line| puts line }
+            Note.show(title, book)
           else
             puts "Error: file '#{title}' does not exist"
+          end
+        end
+      end
+
+      class ExportHTML < Dry::CLI::Command
+        desc "Export a note from Markdown to HTML"
+
+        option :title, type: :string, desc: "Title of the note"
+        option :book, type: :string, desc: "Book"
+        option :all, type: :boolean, default: false, desc: "Export all notes from all books"
+
+        example [
+          '--all                       # Exports all notes from all books',
+          '--all --book "My Book"      # Exports all notes from the book "My Book"',
+          'todo                        # Exports a note titled "todo" from the global book',
+          '"New note" --book "My book" # Exports a note titled "New note" from the book "My book"',
+          'thoughts --book Memoires    # Exports a note titled "thoughts" from the book "Memoires"'
+        ]
+
+        def call(**options)
+          book = options[:book]
+          all = options[:all]
+          title = options[:title]
+          title += ".rn" unless title.nil?
+          if all
+            if book.nil?
+              global_notes = get_notes_from_path(books_path(book))
+              global_notes.each do |global_note|
+                Note.export_html(global_note, book)
+              end
+              directories = get_books_from_path(books_path(book))
+              directories.each do |directory|
+                unless Dir.empty?(books_path(directory))
+                  dir_notes = get_notes_from_path(books_path(directory))
+                  dir_notes.each do |dir_note|
+                    Note.export_html(dir_note, directory)
+                  end
+                end
+              end
+            else
+              if Dir.exist?(books_path(book))
+                book_notes = get_notes_from_path(books_path(book))
+                book_notes.each { |book_note| Note.export_html(book_note, book) }
+              else
+                puts "The book '#{book}' does not exist."
+              end
+            end
+          else
+            title ? Note.export_html(title, book) : puts("Please type the title of the note that you want to export")
           end
         end
       end

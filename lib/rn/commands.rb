@@ -20,6 +20,7 @@ module RN
       prefix.register "edit", Notes::Edit
       prefix.register "list", Notes::List
       prefix.register "show", Notes::Show
+      prefix.register "export_html", Notes::ExportHTML
     end
 
     register "version", Version, aliases: ["v", "-v", "--version"]
