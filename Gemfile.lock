@@ -10,7 +10,7 @@ GEM
       reline (>= 0.1.5)
     pastel (0.8.0)
       tty-color (~> 0.5)
-    redcarpet (3.5.0)
+    redcarpet (3.5.1)
     reline (0.1.6)
       io-console (~> 0.5)
     tty-color (0.5.2)
