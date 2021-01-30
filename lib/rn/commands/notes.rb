@@ -17,6 +17,7 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
+          Book.create(book)
           Note.create(title, book)
         rescue Errno::EACCES
           puts "Permission denied for create '#{title}' on '#{books_path(book)}'"

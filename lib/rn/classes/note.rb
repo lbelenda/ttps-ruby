@@ -8,13 +8,6 @@ class Note
     require_relative "../classes/book"
 
     if valid_name? title
-      if !book.nil?
-        if valid_name?(book)
-          Book.create(book)
-        else
-          return puts "Only numbers, letters and spaces are allowed for the book title"
-        end
-      end
       tmp = Tempfile.new("buffer")
       tmp.rewind
       TTY::Editor.open(tmp.path, command: default_editor)

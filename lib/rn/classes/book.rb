@@ -2,16 +2,19 @@ class Book
   attr_accessor :name, :global
 
   def self.create(name)
-    if valid_name? name
-      if Dir.exist?(books_path(name))
-        puts "the book '#{name}' already exists, your note will be saved there"
+    unless name.nil?
+      if valid_name? name
+        if Dir.exist?(books_path(name))
+          puts "the book '#{name}' already exists, your note will be saved there"
+        else
+          puts "creating book"
+          TTY::File.create_dir(books_path(name))
+          puts "book '#{name}' created succesfully"
+        end
       else
-        puts "creating book"
-        TTY::File.create_dir(books_path(name))
-        puts "book '#{name}' created succesfully"
+        puts "Only numbers, letters and spaces are allowed for the book title"
+        abort
       end
-    else
-      puts "Only numbers, letters and spaces are allowed for the book title"
     end
   end
 
