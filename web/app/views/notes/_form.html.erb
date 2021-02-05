@@ -11,6 +11,11 @@
     </div>
   <% end %>
 
+ <div class="field">
+    <%= form.label :book_id %>
+    <%= form.text_field :book_id %>
+  </div>
+
   <div class="field">
     <%= form.label :title %>
     <%= form.text_field :title %>
@@ -18,12 +23,7 @@
 
   <div class="field">
     <%= form.label :body %>
-    <%= form.text_field :body %>
-  </div>
-
-  <div class="field">
-    <%= form.label :book_id %>
-    <%= form.text_field :book_id %>
+    <%= form.rich_text_area :body %>
   </div>
 
   <div class="actions">
