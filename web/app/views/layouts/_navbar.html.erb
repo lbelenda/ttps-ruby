@@ -1,0 +1,16 @@
+<nav class="navbar navbar-default" style="margin-top: 10px;">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Bienvenido, <%= current_user.email %></a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="navbar-collapse-2">
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <%= link_to('Logout', destroy_user_session_path, method: :delete) %>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container -->
+</nav><!-- /.navbar -->

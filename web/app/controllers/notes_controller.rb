@@ -1,5 +1,5 @@
 class NotesController < ApplicationController
-  before_action :set_note, only: [:show, :edit, :update, :destroy]
+  before_action :set_note, only: [:show, :edit, :update, :export , :destroy]
   before_action :set_book, except:  [:destroy, :export]
 
   # GET /notes
@@ -9,16 +9,24 @@ class NotesController < ApplicationController
 
   # GET /notes/1
   def show
+    respond_to do |format|
+      format.html
+      format.pdf do
+        pdf = @note.export_pdf
+        send_data pdf.render, filename: "export_#{@note.title}.pdf", type: "application/pdf", disposition: "inline"
+      end
+    end
   end
 
   # GET /notes/new
   def new
-    #@note = Note.new
+    @books = Book.all
     @note = @book.notes.new
   end
 
   # GET /notes/1/edit
   def edit
+    @books = Book.all
   end
 
   # POST /notes
@@ -49,7 +57,7 @@ class NotesController < ApplicationController
 
   private
     def set_book
-      @book = current_user.books.find(params[:book_id])
+      @book = params[:book_id].present? ? (current_user.books.find(params[:book_id])) : (current_user.books.find_by(name: "Global"))
     end
 
     # Use callbacks to share common setup or constraints between actions.

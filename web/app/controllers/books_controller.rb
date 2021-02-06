@@ -8,6 +8,13 @@ class BooksController < ApplicationController
 
   # GET /books/1
   def show
+    respond_to do |format|
+      format.html
+      format.pdf do
+        pdf = @book.export_pdf
+        send_data pdf.render, filename: "export_#{@book.name}.pdf", type: "application/pdf", disposition: "inline"
+      end
+    end
   end
 
   # GET /books/new

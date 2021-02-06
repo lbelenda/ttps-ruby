@@ -5,4 +5,11 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   has_many :books, dependent: :destroy
+
+  after_create :create_global_book
+
+  def create_global_book
+    books.create(name: "Global")
+  end
+
 end

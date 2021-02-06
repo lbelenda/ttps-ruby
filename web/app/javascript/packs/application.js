@@ -3,10 +3,10 @@
 // a relevant structure within app/javascript and only use these pack files to reference
 // that code so it'll be compiled.
 
-import Rails from "@rails/ujs"
-import Turbolinks from "turbolinks"
-import * as ActiveStorage from "@rails/activestorage"
-import "channels"
+import Rails from '@rails/ujs'
+import Turbolinks from 'turbolinks'
+import * as ActiveStorage from '@rails/activestorage'
+import 'channels'
 
 Rails.start()
 Turbolinks.start()
@@ -18,5 +18,13 @@ ActiveStorage.start()
 //= require turbolinks
 //= require_tree .
 
-require("trix")
-require("@rails/actiontext")
+window.check_input = function () {
+  if (document.getElementById('note_title').value === '') {
+    document.getElementById('button').disabled = true
+  } else {
+    document.getElementById('button').disabled = false
+  }
+}
+
+require('trix')
+require('@rails/actiontext')

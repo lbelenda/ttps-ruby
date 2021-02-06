@@ -1,0 +1,20 @@
+.truncate {
+  display: block;
+  width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navbar-right {
+  margin-right: 10px !important;
+}
+
+.center_div{
+  margin: 0 auto;
+  width:80% /* value of your choice which suits your alignment */
+}
+
+.trix-button-group--file-tools {
+  display: none !important;
+}

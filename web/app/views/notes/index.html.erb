@@ -1,6 +1,4 @@
-<p id="notice"><%= notice %></p>
-
-<h1>Notes</h1>
+<h1>Notas del libro "<%= @book.name %>"</h1>
 
 <table class="table">
   <thead class="table-dark">
@@ -18,7 +16,8 @@
         <td><span class="truncate"><%= note.body.to_plain_text %></span></td>
         <td><%= link_to 'Abrir', book_note_path(@book, note) %></td>
         <td><%= link_to 'Editar', edit_book_note_path(@book, note) %></td>
-        <td><%= link_to 'Eliminar', book_note_path(@book, note), method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Exportar', book_note_path(@book, note, format: "pdf"), target: "_blank" %></td>
+        <td><%= link_to 'Eliminar', book_note_path(@book, note), method: :delete, data: { confirm: 'Estas seguro?' } %></td>
       </tr>
     <% end %>
   </tbody>
