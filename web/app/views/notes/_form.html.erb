@@ -26,7 +26,8 @@
     <%= form.rich_text_area :body %>
   </div>
 
-  <div class="actions">
-    <%= form.submit %>
+  <div class="actions" style="margin-top: 10px;">
+    <%= form.submit "Crear nota", class: 'btn btn-success' %>
+    <%= link_to 'Volver', book_notes_path(@book), class: "btn btn-danger" %>
   </div>
 <% end %>

@@ -3,7 +3,7 @@ class BooksController < ApplicationController
 
   # GET /books
   def index
-    @books = current_user.books
+    @books = current_user.books.paginate(page: params[:page], per_page: 10)
   end
 
   # GET /books/1
@@ -24,7 +24,7 @@ class BooksController < ApplicationController
     @book = current_user.books.new(book_params)
 
     if @book.save
-      redirect_to @book, notice: 'Book was successfully created.'
+      redirect_to books_path, notice: 'Libro creado exitosamente'
     else
       render :new
     end
@@ -33,7 +33,7 @@ class BooksController < ApplicationController
   # PATCH/PUT /books/1
   def update
     if @book.update(book_params)
-      redirect_to @book, notice: 'Book was successfully updated.'
+      redirect_to @book, notice: 'Libro modificado exitosamente'
     else
       render :edit
     end
@@ -42,7 +42,7 @@ class BooksController < ApplicationController
   # DELETE /books/1
   def destroy
     @book.destroy
-    redirect_to books_url, notice: 'Book was successfully destroyed.'
+    redirect_to books_url, notice: 'Libro eliminado'
   end
 
   private

@@ -1,24 +1,19 @@
 <p id="notice"><%= notice %></p>
 
 <p>
-  <strong>Title:</strong>
+  <strong>Libro:</strong>
+  <%= @note.book.name %>
+</p>
+
+<p>
+  <strong>Titulo:</strong>
   <%= @note.title %>
 </p>
 
 <p>
-  <strong>Body:</strong>
+  <strong>Contenido:</strong>
   <%= @note.body %>
 </p>
 
-<p>
-  <strong>Book:</strong>
-  <%= @note.book_id %>
-</p>
-
-<p>
-  <strong>User:</strong>
-  <%= @note.user_id %>
-</p>
-
-<%= link_to 'Edit', edit_book_note_path(@book, @note) %> |
-<%= link_to 'Back', book_notes_path(@book) %>
+<%= link_to 'Edit', edit_book_note_path(@book, @note), class: 'btn btn-success' %>
+<%= link_to 'Back', book_notes_path(@book), class: 'btn btn-danger' %>

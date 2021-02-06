@@ -1,10 +1,10 @@
 class NotesController < ApplicationController
   before_action :set_note, only: [:show, :edit, :update, :destroy]
-  before_action :set_book, except: :destroy
+  before_action :set_book, except:  [:destroy, :export]
 
   # GET /notes
   def index
-    @notes = @book.notes
+    @notes = @book.notes.paginate(page: params[:page], per_page: 10)
   end
 
   # GET /notes/1

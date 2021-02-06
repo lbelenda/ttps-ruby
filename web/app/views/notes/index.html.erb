@@ -2,12 +2,12 @@
 
 <h1>Notes</h1>
 
-<table>
-  <thead>
+<table class="table">
+  <thead class="table-dark">
     <tr>
-      <th>Titlulo</th>
-      <th>Contenido</th>
-      <th colspan="1"></th>
+      <th scope="col">Titlulo</th>
+      <th scope="col">Contenido</th>
+      <th scope="col" colspan="1"></th>
     </tr>
   </thead>
 
@@ -15,7 +15,7 @@
     <% @notes.each do |note| %>
       <tr>
         <td><%= note.title %></td>
-        <td><%= note.body %></td>
+        <td><span class="truncate"><%= note.body.to_plain_text %></span></td>
         <td><%= link_to 'Abrir', book_note_path(@book, note) %></td>
         <td><%= link_to 'Editar', edit_book_note_path(@book, note) %></td>
         <td><%= link_to 'Eliminar', book_note_path(@book, note), method: :delete, data: { confirm: 'Are you sure?' } %></td>
@@ -24,6 +24,11 @@
   </tbody>
 </table>
 
+<div class="apple_pagination">
+    <%= will_paginate @notes, :container => false %>
+</div>
+
 <br>
 
-<%= link_to 'Nueva nota', new_book_note_path(@book) %>
+<%= link_to 'Nueva nota', new_book_note_path(@book), class: "btn btn-success" %>
+<%= link_to 'volver', books_path, class: "btn btn-danger"  %>
