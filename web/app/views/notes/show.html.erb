@@ -1,0 +1,17 @@
+<p>
+  <strong>Libro:</strong>
+  <%= @note.book.name %>
+</p>
+
+<p>
+  <strong>Titulo:</strong>
+  <%= @note.title %>
+</p>
+
+<p>
+  <strong>Contenido:</strong>
+  <%= @note.body %>
+</p>
+
+<%= link_to 'Edit', edit_book_note_path(@book, @note), class: 'btn btn-success' %>
+<%= link_to 'Back', book_notes_path(@book), class: 'btn btn-danger' %>

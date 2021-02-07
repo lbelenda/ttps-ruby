@@ -1,0 +1,31 @@
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Listado de libros</th>
+      <th scope="col">Cantidad de notas</th>
+      <th scope="col" colspan="2"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @books.each do |book| %>
+      <tr>
+        <td><%= book.name %></td>
+        <td><%= book.notes.count %></td>
+        <td><%= link_to 'Acceder a Notas', book_notes_path(book) %></td>
+        <td><%= link_to_if((book.name != "Global"), 'Editar nombre de libro', edit_book_path(book)) %></td>
+        <td><%= link_to 'Exportar', book_path(book, format: "pdf"), target: "_blank" %></td>
+        <td><%= link_to_if((book.name != "Global"), "Eliminar Libro", book, method: :delete) %></td>
+
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<div class="apple_pagination">
+    <%= will_paginate @books, :container => false %>
+</div>
+
+<br>
+<%= link_to 'Nueva nota', new_book_note_path(current_user.books.find_by(name: "Global")), class: "btn btn-success" %>
+<%= link_to 'Nuevo libro', new_book_path, class: "btn btn-success" %>

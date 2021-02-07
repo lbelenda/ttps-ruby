@@ -1,0 +1,11 @@
+<p>
+  <strong>Nombre:</strong>
+  <%= @book.name %>
+</p>
+
+<p>
+  <strong>Cantidad de notas:</strong>
+  <%= @book.notes.count %>
+</p>
+
+<%= link_to 'Back', books_path, class: "btn btn-danger" %>

@@ -1,0 +1,32 @@
+<%= form_with(model: [@book, note]) do |form| %>
+  <% if note.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(note.errors.count, "error") %> prohibited this note from being saved:</h2>
+
+      <ul>
+        <% note.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+ <div class="field">
+    <%= form.label :libro %>
+    <%= form.select :book_id, @books.all.pluck(:name, :id), {}, { class: "form-select" }  %>
+  </div>
+
+  <div class="field" style="margin-top: 20px;">
+    <%= form.label :titulo %>
+    <%= form.text_field :title, maxlength: 255, size: 20 %>
+  </div>
+
+  <div class="field" style="margin-top: 20px;">
+    <%= form.rich_text_area :body %>
+  </div>
+
+  <div class="actions" style="margin-top: 10px;">
+    <%= form.submit "Guardar", class: 'btn btn-success', id: "button" %>
+    <%= link_to 'Volver', book_notes_path(@book), class: "btn btn-danger" %>
+  </div>
+<% end %>
